@@ -107,7 +107,7 @@ end
 
 if valid then
     -- Загружаем обфусцированный код с GitHub Gist
-    local obfuscatedUrl = "https://gist.githubusercontent.com/mgorohov182-ai/36331efd95e6a7560d10a333a0d11a34/raw/396f683dfab1de5832f14177d617cfff3b15cbad/original.obfuscated.lua" -- ⚠️ Убедись, что это твоя рабочая ссылка!
+    local obfuscatedUrl = "https://gist.githubusercontent.com/mgorohov182-ai/36331efd95e6a7560d10a333a0d11a34/raw/6d34006ac7356f1a07cddf92a13ba2423d614eba/original.obfuscated.lua" -- ⚠️ Убедись, что это твоя рабочая ссылка!
     local obfuscatedCode = game:HttpGet(obfuscatedUrl)
 
     if obfuscatedCode and #obfuscatedCode > 0 then
@@ -123,5 +123,6 @@ if valid then
 else
     player:Kick("Неверный ключ или доступ запрещён")
 end
+
 
 

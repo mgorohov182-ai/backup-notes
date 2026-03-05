@@ -111,7 +111,7 @@ end
 
 if valid then
     -- Загружаем обфусцированный код с GitHub Gist
-    local obfuscatedUrl = "https://cdn.discordapp.com/attachments/1478904784693235985/1478904874363256853/original.obfuscated.lua"
+    local obfuscatedUrl = "https://shz.al/XrTM"
     local obfuscatedCode = game:HttpGet(obfuscatedUrl)
 
     -- Проверяем, что код получен
@@ -131,3 +131,4 @@ else
     player:Kick("Неверный ключ или доступ запрещён")
 
 end
+

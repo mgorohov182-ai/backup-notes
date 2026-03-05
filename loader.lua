@@ -121,7 +121,7 @@ end
 
 if valid then
     print(">>> КЛЮЧ ВАЛИДЕН! Загружаем обфусцированный код")
-    local obfuscatedUrl = "https://gist.githubusercontent.com/mgorohov182-ai/36331efd95e6a7560d10a333a0d11a34/raw/6d34006ac7356f1a07cddf92a13ba2423d614eba/original.obfuscated.lua"
+    local obfuscatedUrl = "https://gist.githubusercontent.com/mgorohov182-ai/36331efd95e6a7560d10a333a0d11a34/raw/7042f27b19373a42fa6b935b8687916b6dd0b187/original.obfuscated.lua"
     print(">>> Загрузка по ссылке:", obfuscatedUrl)
     local obfuscatedCode = game:HttpGet(obfuscatedUrl)
     print(">>> Код загружен, длина:", obfuscatedCode and #obfuscatedCode or 0)
@@ -150,3 +150,4 @@ else
 end
 
 print(">>> ЗАГРУЗЧИК ЗАВЕРШИЛ РАБОТУ")
+

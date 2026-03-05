@@ -1,24 +1,31 @@
--- loader.lua – Финальная версия с отладкой (Gist)
+-- loader.lua – Финальная версия без loadfile (с хранением ключа через HttpService)
 local player = game.Players.LocalPlayer
 local userId = tostring(player.UserId)
+local HttpService = game:GetService("HttpService")
+local keyFileName = "nano_key.json" -- теперь будем хранить ключ в JSON
 
--- Функции для работы с файлами (для сохранения ключа)
-local function readFile(name)
-    local f, err = loadfile(name)
-    if f then return f() end
+-- Функция для чтения ключа из файла JSON
+local function readKeyFromFile()
+    local success, data = pcall(function()
+        return HttpService:JSONDecode(readfile(keyFileName))
+    end)
+    if success and data and data.key then
+        return data.key
+    end
     return nil
 end
 
-local function writeFile(name, data)
-    local f = io.open(name, "w")
-    if f then f:write(data) f:close() end
+-- Функция для записи ключа в файл JSON
+local function writeKeyToFile(key)
+    local data = HttpService:JSONEncode({key = key})
+    writefile(keyFileName, data)
 end
 
 -- Загружаем сохранённый ключ, если есть
-local key = readFile("nano_key.txt") or ""
+local key = readKeyFromFile() or ""
 
 if key == "" then
-    -- Создаём простое окно для ввода ключа
+    -- Создаём окно для ввода ключа (без изменений)
     local gui = Instance.new("ScreenGui")
     gui.Parent = player.PlayerGui
     gui.Name = "KeySystem"
@@ -57,10 +64,6 @@ if key == "" then
     textbox.Font = Enum.Font.Gotham
     textbox.TextSize = 14
 
-    local textCorner = Instance.new("UICorner")
-    textCorner.CornerRadius = UDim.new(0, 6)
-    textCorner.Parent = textbox
-
     local btn = Instance.new("TextButton")
     btn.Parent = frame
     btn.Size = UDim2.new(0.4, 0, 0, 35)
@@ -71,34 +74,27 @@ if key == "" then
     btn.Font = Enum.Font.GothamBold
     btn.TextSize = 14
 
-    local btnCorner = Instance.new("UICorner")
-    btnCorner.CornerRadius = UDim.new(0, 6)
-    btnCorner.Parent = btn
-
     btn.MouseButton1Click:Connect(function()
         key = textbox.Text
         if key and key ~= "" then
-            writeFile("nano_key.txt", key)
+            writeKeyToFile(key)
             gui:Destroy()
         end
     end)
 
-    -- Ждём, пока ключ не будет введён
     repeat task.wait() until key and key ~= ""
 end
 
--- ⚠️ ЗАМЕНИ ЭТУ ССЫЛКУ на свою (от Google Sheets с ключами)
-local csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSnarWFrJRkrKPFvOMN7NUYttvLFy_Wg0LfnnQQDMEVduwD_-Lo0HLfy0X7m_J2KBQ9aJf4I8ylTAWh/pub?output=csv"
+-- Проверка ключа через Google Sheets (без изменений)
+local csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSnarWFrJRkrKPFvOMN7NUYttvLFy_Wg0LfnnQQDMEVduwD_-Lo0HLfy0X7m_J2KBQ9aJf4I8ylTAWh/pub?output=csv" -- ⚠️ Убедись, что это твоя ссылка!
 
 local valid = false
 local csv = game:HttpGet(csvUrl)
 
 for line in csv:gmatch("[^\r\n]+") do
-    -- Пропускаем заголовок
     if not line:match("^key") then
         local k, uid = line:match("([^,]+),([^,]+)")
         if k and uid then
-            -- Убираем возможные пробелы
             k = k:gsub("%s+", "")
             uid = uid:gsub("%s+", "")
             if k == key and uid == userId then
@@ -111,25 +107,21 @@ end
 
 if valid then
     -- Загружаем обфусцированный код с GitHub Gist
-    local obfuscatedUrl = "https://gist.githubusercontent.com/mgorohov182-ai/36331efd95e6a7560d10a333a0d11a34/raw/396f683dfab1de5832f14177d617cfff3b15cbad/original.obfuscated.lua"
+    local obfuscatedUrl = "https://gist.githubusercontent.com/mgorohov182-ai/36331efd95e6a7560d10a333a0d11a34/raw/396f683dfab1de5832f14177d617cfff3b15cbad/original.obfuscated.lua" -- ⚠️ Убедись, что это твоя рабочая ссылка!
     local obfuscatedCode = game:HttpGet(obfuscatedUrl)
 
-    -- Проверяем, что код получен
     if obfuscatedCode and #obfuscatedCode > 0 then
         local func = loadstring(obfuscatedCode)
         if func then
             func()
         else
-            warn("Ошибка: loadstring не смог выполнить код. Возможно, код повреждён.")
-            -- Выведем первые 100 символов для отладки
-            print("Первые 100 символов кода:", obfuscatedCode:sub(1,100))
+            warn("Ошибка компиляции loadstring. Первые 100 символов кода:", obfuscatedCode:sub(1,100))
         end
     else
-        warn("Ошибка: не удалось загрузить код по ссылке. Ссылка недействительна?")
+        warn("Не удалось загрузить код по ссылке:", obfuscatedUrl)
     end
 else
     player:Kick("Неверный ключ или доступ запрещён")
-
 end
 
 
